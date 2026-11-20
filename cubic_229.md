@@ -71,7 +71,7 @@ Use the Mellin integral of $(-L'/L)(s)y^s/[s(s-1)]$ on $\sigma=1+1/u$. It equals
 $$
  u/D\gg \min\{u/(1+\log\mathcal Q),\sqrt u\}.
 $$
-At the smallest allowed $u$, the two lower bounds grow at least as $x^{2\varepsilon/15}/(\log x)^2$ and $x^{\varepsilon/6}$, up to fixed constants. Both dominate $x^{\varepsilon/8}$, and for larger $u$ they also absorb the logarithms of the polynomial prefactors. This proves the estimate. The untwisted and sign constituents of the host are Dirichlet factors. A simultaneous good-pair estimate at the **thick** scale and a nonabelian Selmer bound remain separate requirements. [Archived thin-scale definition](lean/src/Formalism/SizeWindowBrackets/GrowthBoundGivesRiemannHypothesis.lean#L55)
+At the smallest allowed $u$, the two lower bounds grow at least as $x^{2\varepsilon/15}/(\log x)^2$ and $x^{\varepsilon/6}$, up to fixed constants. Both dominate $x^{\varepsilon/8}$, and for larger $u$ they also absorb the logarithms of the polynomial prefactors. This proves the estimate. The untwisted and sign constituents of the host are Dirichlet factors. The follow-up derives a simultaneous good-pair estimate at the **thick** scale using the archived prime-progression inputs. The nonabelian Selmer bound remains open. [Good-pair proof](cubic_229_followup.md#2-one-good-pair-for-all-three-twists) [Archived thin-scale definition](lean/src/Formalism/SizeWindowBrackets/GrowthBoundGivesRiemannHypothesis.lean#L55)
 
 ## A positive kernel and real-axis nonvanishing
 

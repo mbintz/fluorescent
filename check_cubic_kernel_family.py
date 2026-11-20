@@ -2,9 +2,10 @@
 Run: sage -python check_cubic_kernel_family.py [maximum discriminant]
 """
 import argparse
-from collections import Counter
+from collections import Counter, defaultdict
 from fractions import Fraction
 from functools import lru_cache
+from math import isqrt
 
 from sage.all import ComplexBallField, RealBallField, pari
 
@@ -94,8 +95,8 @@ def integrated_sign(a, c):
             return 'changes', (x, suffix_positive(upper))
 
     def check(left, right, depth):
-        pl, nl, tl = sums(left)
-        pr, nr, tr = sums(right)
+        _, nl, tl = sums(left)
+        pr, _, _ = sums(right)
         if pr - nl - tl > 0:
             return 'bessel', None
         mid = (left + right)/2
@@ -131,6 +132,54 @@ def check_splitting_pattern():
         raise ArithmeticError('Local splitting criterion failed')
 
 
+def check_field_list(fields, bound):
+    """Independent covering search from the rank-two Hermite bound."""
+    by_disc = defaultdict(list)
+    for f in fields:
+        disc = int(pari.nfdisc(f))
+        if not (0 < disc <= bound and isqrt(disc)**2 != disc and f.polisirreducible()):
+            raise ArithmeticError(f'Invalid cubic in list: {f}')
+        if any(pari.nfisisom(f, g) for g in by_disc[disc]):
+            raise ArithmeticError(f'Duplicate field: {f}')
+        by_disc[disc].append(f)
+    root = isqrt(bound) + 1
+    # trace is 0 or 1, second coefficient >= -sqrt(bound)/3, and
+    # norm^2 <= ((2*sqrt(bound)+1)/9)^3.
+    max_norm = isqrt((2*root+1)**3 // 729) + 1
+    for trace in (0, 1):
+        for s in range(-(root//3+1), 1):
+            for norm in range(-max_norm, max_norm+1):
+                f = pari.Polrev([-norm, s, -trace, 1])
+                disc = int(pari.poldisc(f))
+                if disc <= 0 or isqrt(disc)**2 == disc or not f.polisirreducible():
+                    continue
+                d = int(pari.nfdisc(f))
+                if d <= bound and not any(pari.nfisisom(f, g) for g in by_disc[d]):
+                    raise ArithmeticError(f'Missing field at discriminant {d}: {f}')
+
+
+def check_euler_coefficients(f, a):
+    nf = pari.nfinit(f)
+    combined = [0, 1] + [0]*(N-1)
+    for p in range(2, N+1):
+        if not pari.isprime(p):
+            continue
+        powers = [1]
+        while p * powers[-1] <= N:
+            powers.append(p*powers[-1])
+        local = [1, -1] + [0]*(len(powers)-2)
+        for prime_ideal in pari.idealprimedec(nf, p):
+            degree = int(prime_ideal[3])
+            for j in range(degree, len(local)):
+                local[j] += local[j-degree]
+        for j, pk in enumerate(powers[1:], start=1):
+            for m in range(1, N//pk+1):
+                if m % p != 0 and combined[m]:
+                    combined[m*pk] = combined[m]*local[j]
+    if a != combined[1:]:
+        raise ArithmeticError(f'Local factor mismatch: {f}')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('bound', type=int, default=10000, nargs='?')
@@ -139,17 +188,32 @@ def main():
         parser.error('bound must be positive')
     check_splitting_pattern()
     fields = pari.nflist([3, 2], [1, bound], 0)
+    check_field_list(fields, bound)
     zeta = pari.lfuncreate(1)
     counts = Counter()
     changes = []
+    pattern_examples = []
     first = {}
     for f in sorted(fields, key=lambda f: int(pari.nfdisc(f))):
         d = int(pari.nfdisc(f))
         a = list(map(int, pari.lfunan(pari.lfundiv(pari.lfuncreate(f), zeta), N)))
+        check_euler_coefficients(f, a)
         if a[0] != 1:
             raise ArithmeticError("Unexpected leading coefficient")
         c = 2*R.pi()/R(d).sqrt()
         r = (-c).exp()
+        if (d <= 10000 and all(d % p for p in (2, 3, 5, 7, 11))
+                and [a[p-1] for p in (2, 3, 5, 7, 11)] == [2, 0, -1, 0, 0]):
+            pattern_examples.append(d)
+        if d == 316:
+            if not (r > R(7)/10 and sum(-v*Fraction(7,10)**j
+                    for j,v in enumerate(a[:16]) if v < 0) > 1):
+                raise ArithmeticError('Expected failure of first-term domination')
+        if d == 2857:
+            u = Fraction(5, 6)
+            total = sum(v*u**j for j,v in enumerate(a))
+            if not (as_ball(u) < r and total + geometric_tail(u) < -Fraction(1,5)):
+                raise ArithmeticError('Expected negative exponential series')
         negative = sum(-v*r**j for j,v in enumerate(a) if v < 0)
         if negative + geometric_tail(r) < 1:
             kind = 'leading'
@@ -164,6 +228,7 @@ def main():
     print('Field discriminant bound:', bound, ' Fields:', len(fields))
     for kind in ('leading', 'polynomial', 'bessel', 'changes'):
         print(kind, counts[kind], 'first', first.get(kind))
+    print('Five-prime pattern through 10000:', pattern_examples)
     for d, f, x, blocks in changes:
         print(f'Negative at x={x}: disc={d}, polynomial={f}, positive suffix masses on mesh 1/{blocks}')
 
