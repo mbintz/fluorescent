@@ -63,6 +63,19 @@ def quadrature_weights(values):
 
 
 def certificate():
+    height = R(10)
+    end = J * H
+    envelope = 576 * (height / 2).exp()
+    grid_error = envelope / ((R.pi() / H).exp() - 1)
+    mesh_tail = 288 * (-end.exp() / 3).exp()
+    series_tail = (4 * H * (J + 1) * end.exp() * (-R(CUTOFF) / 5).exp()
+                   / (1 - (-R(1) / 5).exp())**2)
+    scale = 2 * R.pi() / R(229).sqrt()
+    if not (scale > R(2)/5 and scale * (R(1)/2).cos() > R(1)/3
+            and (-scale).exp() < R(2)/3 and (1 - (-R(1)/3).exp())**-2 < 16
+            and end.exp() > 3 and grid_error + mesh_tail + series_tail < ERROR):
+        raise ArithmeticError("The stated uniform quadrature bound failed")
+
     values = coefficients(CUTOFF)
     if values[1:17] != [1, 0, -1, 1, -1, 0, 0, 0, 0, 0, -1, -1, 0, 0, 1, 1]:
         raise ArithmeticError("Unexpected local coefficients")
@@ -128,6 +141,7 @@ def certificate():
         left, right = (jet(C(0, t), 0)[0].real() for t in ordinates)
         if not ((left > ERROR and right < -ERROR) or (left < -ERROR and right > ERROR)):
             raise ArithmeticError(f"Sign change unresolved at {a}/10^6")
+    for a in starts:
         print(f"Simple critical-line zero in ({a}/10^6, {a+1}/10^6)")
 
 
