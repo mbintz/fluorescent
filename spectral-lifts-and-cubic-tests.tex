@@ -1,0 +1,179 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.92in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\supp}{\operatorname{supp}}
+\title{Close zeros, spectral lifts, and a test for the cubic clock}
+\author{}\date{}
+\begin{document}
+\maketitle
+\vspace{-2.8em}
+
+\section*{1. A uniform bound in the spectral trace proof}
+In the supplied version of Alessandro Maria Masullo's \emph{The Music of the
+Primes}, the proof of Theorem 10.4.2.8 requires lifts of the biorthogonal
+vectors with norms bounded by a single $C+\varepsilon$ in (10.4.2.24),
+p.~463. Proposition 10.2.2.2, cited there, concerns the norms of the
+evaluation functionals $\eta$ on pp.~446--447. The following specializes
+the issue to the Riemann zeta function.
+
+Take the trivial character, $a=1/2$, a fixed strip $I=[-\alpha,\alpha]$
+of positive width and a fixed Sobolev index $s>1$. In the centered
+coordinates of (10.2.2.4), the evaluation at a critical-line zero
+$1/2+it$ is $\eta_t(u)=e^{itu}$, with $u=\log|g|$. The compact norm-one
+factor contributes a constant Haar volume. Equation (10.2.2.8) and its
+proof give the dual norm on this component with density
+\[
+ w(u)=e^{-2\alpha |u|}(1+u^2)^{-s/2}.
+\]
+In particular $\|\eta_t\|$ is constant. Yet for any two ordinates $t,t'$,
+\[
+ \|\eta_t-\eta_{t'}\|\le C_1|t-t'|,\qquad
+ C_1^2=\int_{\mathbb R}u^2w(u)\,du
+\]
+up to the same Haar normalization. If the uncentered convention of
+(10.4.2.22) is used, the extra fixed factor $e^{au}$ merely changes the
+constant on choosing $\alpha>|a|$, an allowed strip.
+For any lift $\psi_t$ biorthogonal to the evaluations, the pairings are
+one at $t$ and zero at $t'\ne t$. Consequently
+\[
+ 1=|\langle\psi_t,\eta_t-\eta_{t'}\rangle|
+ \le C_1\|\psi_t\|\,|t-t'|.
+\]
+Conrey's unconditional positive proportion of simple critical-line zeros
+and the Riemann--von Mangoldt count give $\gg T\log T$ distinct such
+ordinates through $T$. Hence some gaps are $O(1/\log T)$.
+The uniform bound on the lifts is impossible. The estimate applies to
+every lift, since the evaluations factor through the quotient. It leaves
+open bounds for sums of projections or for grouped zeros.
+
+\paragraph{An amplification.}
+In centered coordinates fix $0<r<\alpha$ and an interval length
+$\ell=r/2$. Pigeonholing up to $T$ gives an interval of length $\ell$
+containing $k+1\gg_\ell\log T$ distinct simple ordinates $t_0,\ldots,t_k$.
+For $f(v)=\Rea\langle\psi_{t_0},\eta_v\rangle$, interpolation at
+$t_1,\ldots,t_k$ gives $1\le\sup|f^{(k)}|\ell^k/k!$.
+Since $|u|^k/k!\le r^{-k}e^{r|u|}$, the derivative is bounded by
+$C_r\|\psi_{t_0}\|k!r^{-k}$. Thus
+$\|\psi_{t_0}\|\ge C_r^{-1}2^k$: the largest required norm through
+$T$ grows at least as a positive power of $T$. Orthogonal projection
+onto a joint subspace avoids the requirement of separating each pair.
+This calculation audits the particular estimate, not every trace identity.
+
+\newpage
+\section*{2. A single smooth test in a moving prime window}
+The cubic $F=\mathbb Q[x]/(x^3-4x-1)$ has
+$A(s)=\zeta_F(s)/\zeta(s)=L_k(s,\xi)$ for an order-three ideal-class
+character of $k=\mathbb Q(\sqrt{229})$. Its completed $L$-function is
+entire and self-dual. On this character component Masullo's
+Theorem 12.5.1.1 (p.~519) asks the log-norm test to vanish at $u=0$.
+The different condition in (13.3.1.2), p.~522, asks for two vanishing
+Mellin moments because $[k:\mathbb Q]=2$. On this component they are
+the ordinary moments of orders zero and one in $u$.
+
+There is an explicit smooth test meeting both conditions and detecting
+every off-line zero. Let $b$ be the density of the convolution of
+uniform probabilities on $[-a_j,a_j]$, $a_j=2^{-j-2}$, $j\ge1$.
+Its bilateral Laplace transform is
+\[
+ B(z)=\prod_{j\ge1}\frac{\sinh(a_jz)}{a_jz}.
+\]
+The product converges locally uniformly, and is nonzero for $\Rea z\ne0$
+because $\sum_j a_j^2<\infty$ and each factor is nonzero there.
+On any bounded vertical strip the first $m$ factors give decay of order
+$m$, and the remaining factors have product bounded by
+$\exp(|\Rea z|\sum_j a_j)$. Fourier inversion therefore gives a smooth
+density supported on $[-1/4,1/4]$.
+
+Set $g=b'$, $\widetilde g(u)=g(-u)$, $r=g*\widetilde g$. Its transform
+is $R(z)=-z^2 B(z)^2$. In particular $R(0)=R'(0)=0$, $R(it)\ge0$,
+and $R$ has no off-line zeros. For $T>1/2$ form the test
+\[
+ r_T(u)=\tfrac12\big(r(u-T)+r(u+T)\big).
+\]
+It vanishes near the origin, and its transform $R(z)\cosh(Tz)$ still
+has a double zero at zero. Multiplying by the conjugate class character
+on the norm-one group isolates the desired component. In the ordinary
+explicit formula the finite-prime terms involve only prime powers in
+$[e^{T-1/2},e^{T+1/2}]$.
+
+\paragraph{Bounded response criterion.}
+Let $E(T)=W_A(r_T)$ in the centered Weil formula. Then $E(T)$ is bounded
+for $T>1/2$ if and only if all nontrivial zeros of $A$ lie on the
+critical line. Indeed, putting $z=\rho-1/2$ and counting multiplicities,
+the ordinary explicit formula and symmetry give
+\[
+ E(T)=\sum_z R(z)e^{Tz},\qquad
+ \int_0^\infty E(T)e^{-sT}\,dT=\sum_z\frac{R(z)}{s-z}
+ \quad(\Rea s>1/2).
+\]
+Rapid decay permits termwise integration and local meromorphic continuation.
+On the critical line the first sum is uniformly bounded. Conversely,
+boundedness would make the integral holomorphic on $\Rea s>0$, while
+at any off-line zero there the sum has a pole of residue
+$\operatorname{ord}(\rho)\,R(z)\ne0$. The functional equation supplies
+the other half of the strip. A uniform estimate for these moving tests
+remains to be proved. The point here is that the two printed test
+restrictions can both be met. Theorem 13.3.1.2 in the supplied PDF is
+an unfilled statement, and (12.5.1.3) has a strip-dependent zero sum.
+
+\newpage
+\section*{3. Two checks on the accompanying reports}
+\paragraph{A discrepancy in the oper counts.}
+For the separate cubic $x^3-2$, the Gemini Round 3 table uses
+$f=t^3-2$ and, at $\mu=1/2$, the equation
+$f y''+(3/2)t^2 y'+B y=0$. One can test dormancy over
+$\mathbb F_p(t)$ directly. Put
+\[
+ M=\begin{pmatrix}0&f\\-B&-3t^2/2\end{pmatrix},\qquad
+ U_0=I,\quad U_{j+1}=fU_j'-jf'U_j+U_jM .
+\]
+Iteration gives $(y,y')^{(j)}=f^{-j}U_j(y,y')$ in column notation.
+The restricted $p$th power of $d/dt$ vanishes, so a zero matrix $U_p$
+is exactly the zero $p$-curvature test. Polynomial arithmetic gives
+\[
+\begin{array}{c|c|c}
+ p & B\text{ for which }U_p=0 &\text{Gemini report for the same curve}\\ \hline
+ 7 & 3,5,6&\text{no values}\\
+ 23 &0&0,3,6\\
+ 37 &\text{no values}&\text{three values}
+\end{array}
+\]
+These direct results agree with the equation in the Astra Round 3 report
+after the change of accessory parameter $c=-4B$. For example at $p=7$,
+$[t^6](t^3-2)^3=1\bmod7$ and $(-4B)^3=1$ gives exactly $3,5,6$.
+The comparison for this equation makes no claim about the other radii.
+
+\paragraph{The paraboloid set can recover the stronger density.}
+The Fable tower report constructs a bounded-relation-free set with
+$|T|=A^d$, $\max T<n/(4L)$ and
+\[
+ |T|/n\ge 2^{-d}\Gamma^{-1}n^{-2/(d+2)},\qquad
+ \Gamma=4dL(2L)^d,\qquad A=\lfloor(n/\Gamma)^{1/(d+2)}\rfloor .
+\]
+It takes $d$ fixed. In the schedule $2\le L\ll_\varepsilon\log n$,
+choose instead $d=\lfloor\sqrt{\log n/\log(4L)}\rfloor$.
+Then $d\to\infty$, $\log\Gamma=o(\log n)$, and $A\ge2$ eventually.
+Taking logarithms gives
+\[
+ \log(n/|T|)\le d\log2+\log\Gamma+\frac{2\log n}{d+2}
+ \ll\sqrt{\log n\log L},
+\]
+with an absolute implied constant for large $n$. This supplies even the
+exponential-density conjunct in the existing Lean statement
+\texttt{exists\_thick\_set\_sizes} (whose lower bound also divides by $L$).
+The independent rank condition $m^4\le f$ remains in
+\texttt{StandingNumericalData.lean}, line 118. This is an integer-set
+construction and a source-level comparison, without a new Lean build.
+
+\paragraph{Sources.}
+A. M. Masullo, \href{https://math216.wordpress.com/wp-content/uploads/2026/11/the-music-of-the-primes.pdf}
+{\emph{The Music of the Primes}}, supplied 940-page version,
+especially pp.~446--447, 463, 519 and 522.
+J. B. Conrey, \href{https://doi.org/10.1515/crll.1989.399.1}
+{\emph{More than two fifths of the zeros of the Riemann zeta function are
+on the critical line}}, J. reine angew. Math. 399 (1989), 1--26.
+The local comparisons refer to the two \texttt{wall1\_r3} and three
+\texttt{kill\_tower} reports in the workspace.
+\end{document}
