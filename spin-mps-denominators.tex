@@ -1,0 +1,94 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.93in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\lcm}{\operatorname{lcm}}
+\newcommand{\den}{\operatorname{den}}
+\newtheorem*{theorem}{Theorem}
+\title{Prime denominators under spin fusion in a matrix product state}
+\date{}
+\begin{document}
+\maketitle
+\vspace{-2.8em}
+
+Pack $m^2$ spin-$1/2$ particles into $m$ blocks of $m$ particles. In each block use the local symmetric space, a single spin $m/2$ with $m+1$ possible magnetic quantum numbers. We measure the projector onto the maximum total spin $J=m^2/2$ on each product of local magnetic basis states. The least common denominator of all the resulting Born probabilities retains the Chebyshev prime sum through $m^2+1$, up to an explicit normalization.
+
+\section*{The matrix product and its denominator}
+Write $N=m^2$, and let $k_i\in\{0,\ldots,m\}$ be the number of up spins on block $i$. At fixed total $K=\sum_i k_i$, the maximum-spin sector has a single normalized Dicke vector $|D_{N,K}\rangle$. Its amplitude has an open-boundary matrix product representation. On an occupation counter $0,\ldots,N$, take $S|j\rangle=|j+1\rangle$ with $S|N\rangle=0$, and put
+\[
+ A^k=\sqrt{\binom{m}{k}}S^k,\qquad
+ \langle k_1,\ldots,k_m\mid D_{N,K}\rangle
+ =\binom{N}{K}^{-1/2}\langle K| A^{k_m}\cdots A^{k_1}|0\rangle .
+\]
+Indeed there are $\prod_i\binom{m}{k_i}$ microscopic strings with the given block occupancies, out of $\binom{N}{K}$ with total $K$. Thus the probability of the maximum-spin outcome on a product input is
+\[
+ P(\mathbf k)=\frac{\prod_i\binom{m}{k_i}}{\binom{N}{\sum_i k_i}}.
+\]
+The transfer matrices above are a counting gauge of the higher-spin Dicke MPS. Exact canonical forms are available in Raveh and Nepomechie \cite{mps}.
+
+\begin{theorem}
+Let $B_m=\lcm_{\mathbf k}\den P(\mathbf k)$, using reduced rational denominators. For every $m\ge1$,
+\[
+ \boxed{\quad m(m^2+1) B_m=\lcm(1,2,\ldots,m^2+1).\quad}
+\]
+In particular $\psi(m^2+1)=\log(m(m^2+1)B_m)$, where $\psi(x)=\sum_{p^j\le x,\ j\ge1}\log p$.
+\end{theorem}
+
+For product inputs in the individual qubit basis the corresponding denominator on $n$ qubits is $D_n=\lcm_{r=0}^n\binom nr$. Farhi's identity \cite{farhi} gives $(n+1)D_n=L_{n+1}$ with $L_j=\lcm(1,\ldots,j)$ and $D_0=1$. Thus the theorem asserts the exact cost of blocking, $D_N/B_m=m$. For three spin-$3/2$ sites the denominator is $84$, compared with $252$ for nine spin-$1/2$ sites.
+
+For example, in a block of three qubits, local occupations $0,1,2,3$ have multiplicities $1,3,3,1$. The product input $(0,0,3)$ has maximum-spin probability $1/\binom{9}{3}=1/84$. Every other such probability has reduced denominator dividing $84$.
+
+\newpage
+\section*{Proof}
+Put $K=\sum_i k_i$ and $U=\prod_i\binom m{k_i}$. Each reduced denominator divides $D_N$. For $K>0$ the relation
+\[
+ K\binom NK=N\binom{N-1}{K-1}\mid N D_{N-1}=L_N
+\]
+holds. Moreover $m\mid k_i U$ for every $i$, since $k\binom mk=m\binom{m-1}{k-1}$ for $k>0$. Hence $m\mid K U$. The number $(L_N/m)U/\binom NK$ is the product of the two integers $L_N/(K\binom NK)$ and $KU/m$. For $K=0$ the probability is one. It follows that $B_m$ divides both $D_N$ and $L_N/m$. At each prime $p\mid m$, Farhi's formula gives $v_p(D_N)=v_p(L_N)$ because $p\nmid N+1$. Consequently $B_m\mid D_N/m$.
+
+For the reverse divisibility, fix a prime $p$, put $a=v_p(m)$ and $c=m/p^a$. Choose each $k_i=p^a s_i$ with
+\[
+                       s_i\in\{0,1,c-1,c\}.
+\]
+All chosen local binomial coefficients are $p$-units. In fact $(1+x)^m\equiv(1+x^{p^a})^c\pmod p$, and the four coefficients in question are $1,c,c,1$ modulo $p$ (with coincident choices counted once). All integers $h$ between $0$ and $mc$ occur as $\sum_i s_i$. Using $j$ choices from $\{c-1,c\}$ and $m-j$ from $\{0,1\}$ gives the whole interval $[j(c-1),j(c-1)+m]$ of integers. These intervals overlap or touch as $j$ runs from $0$ to $m$, since $c\le m$.
+
+Put $n'=mc=N/p^a$. At the resulting total $K=p^a h$, all of the $p$-part of $\binom{N}{K}$ survives in the probability denominator. Legendre's factorial formula gives
+\[
+ v_p\binom{p^a n'}{p^a h}=v_p\binom{n'}h
+\]
+by cancellation of the terms linear in $n',h,n'-h$. Maximizing over $h$ proves $v_p(B_m)\ge v_p(D_{n'})$. For $a=0$ this is the desired lower bound. For $a>0$, both $N$ and $n'$ are divisible by $p$. Farhi's identity then gives $v_p(D_N)=\lfloor\log_p N\rfloor$ and $v_p(D_{n'})=\lfloor\log_p n'\rfloor=v_p(D_N)-a$. This proves the theorem at every prime.\hfill$\square$
+
+\paragraph{An independent exact check.}
+For a partial chain of $j$ blocks let $g_j(K)$ be the gcd of the products $U$ attainable at occupancy $K$. Initialize $g_0(0)=1$ and assign zero to unreachable entries. The recursion and its output are
+\[
+ g_{j+1}(K)=\gcd_{0\le k\le m}\left[\binom mk g_j(K-k)\right],
+ \qquad
+ B_m=\lcm_{0\le K\le N}\den\frac{g_m(K)}{\binom NK}.
+\]
+The second formula follows by taking the minimum numerator valuation at each prime and fixed $K$. Integer evaluation gives the stated identity through $m=32$. Direct enumeration of the product inputs gives the same denominators through $m=5$.
+
+\newpage
+\section*{What the bond carries}
+Across a cut after $j$ sites the squared Schmidt coefficients at fixed $K$ are
+\[
+ \frac{\binom{jm}{s}\binom{N-jm}{K-s}}{\binom NK},\qquad
+ \max(0,K-N+jm)\le s\le\min(jm,K).
+\]
+Conditioning on the left occupation $s$ gives a product of left and right Dicke vectors, orthogonal for distinct $s$. In particular, for even $m$ the balanced cut of the $K=N/2$ state has exact Schmidt rank $N/2+1$. The shorter chain has larger local spins and a growing virtual space. Exact denominators also use the full family of magnetic sectors.
+
+There is a distinct scale for high-fidelity approximation. For $m\ge2$, choose $0<\delta<1$ and
+\[
+ w=\left\lceil \sqrt{\tfrac{N}{2}\log(2(m-1)/\delta)}\right\rceil .
+\]
+Keep only virtual occupations within $w$ of $jmK/N$ at each interior cut. Under squared amplitudes the occupations are hypergeometric. Hoeffding's sampling-without-replacement bound gives a loss at cut $j$ of at most $2\exp(-2w^2/(jm))$, hence at most $\delta/(m-1)$ \cite{hoeffding}. The union bound shows that the normalized truncated state has squared overlap at least $1-\delta$ with the original and bond at most $2w+1$. Fidelity bounds alone allow perturbations of rational probabilities that change their reduced denominators.
+
+\paragraph{An arithmetic invariant on the virtual space.}
+Suppose an integer matrix $W$ obtained by contracting tensors maps the physical coordinate lattice onto $\mathbb Z^d$. Set $G=WW^{\mathsf T}$. The orthogonal projector onto the row space is $P=W^{\mathsf T}G^{-1}W$. Its least matrix denominator equals the largest Smith invariant of $G$. Indeed an integer right inverse $J$ gives $J^{\mathsf T}PJ=G^{-1}$, so $P$ and $G^{-1}$ have the same denominator. The Smith form gives the latter directly. This lemma requires surjectivity over the integers. For a rational row space one can first choose a basis for its intersection with the physical lattice. In the qubit counting construction, $W|w\rangle=|\#\mathrm{up}(w)\rangle$ and $G$ is diagonal with entries $\binom NK$. In the fused construction above the local magnetic basis is normalized and contains square roots. The theorem computes the denominator of the Born probabilities in that basis.
+
+The connection to the proposed arithmetic argument is structural. Its weighted kernel recursion contracts an index between consecutive theta lifts. It also tracks denominators on lattices at successive stages. The spin calculation isolates the two questions a tensor description must answer. One needs a bound on the intermediate dimension and control of the divisors that survive contraction. Its result recovers the untwisted prime sum at square scales. Bounds for its fluctuations and character-resolved estimates require further arithmetic input.
+\begin{thebibliography}{9}
+\bibitem{mps} D. Raveh and R. I. Nepomechie, \href{https://arxiv.org/abs/2408.04729}{Dicke states as matrix product states}, Phys. Rev. A 110, 052438 (2024).
+\bibitem{farhi} B. Farhi, \href{https://arxiv.org/abs/0906.2295}{An identity involving the least common multiple of binomial coefficients and its application}, Amer. Math. Monthly 116 (2009), 836--839.
+\bibitem{hoeffding} W. Hoeffding, \href{https://doi.org/10.1080/01621459.1963.10500830}{Probability inequalities for sums of bounded random variables}, J. Amer. Statist. Assoc. 58 (1963), 13--30.
+\end{thebibliography}
+\end{document}
