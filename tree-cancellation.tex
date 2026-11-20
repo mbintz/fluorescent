@@ -1,0 +1,244 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper,hmargin=1.02in,vmargin=0.85in]{geometry}
+\linespread{1.04}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem{theorem}{Theorem}
+\newcommand{\E}{\mathbb E}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\ee}{\mathrm e}
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\setlength{\parindent}{1.25em}
+\title{Sharp cancellation for bilinear sums on weighted trees}
+\author{}
+\date{}
+\begin{document}
+\maketitle
+\vspace{-3.7em}
+
+\begin{abstract}
+Attach a variable to each vertex of a tree and a bilinear phase to each
+edge. How large can the average phase become if one may change the phase
+at every vertex by an arbitrary function of its variable? Over
+$\Z/p^k\Z$ the exact answer is a maximum-weight path problem, with each
+edge weighted by the conductor of its character. The upper estimate uses
+iterated Fourier transforms. An integral dual solution gives vertex
+phases attaining it. Over odd finite fields we also compute the largest
+collision probability after arbitrary one-variable perturbations.
+\end{abstract}
+
+\section{An exact norm}
+The starting point is the path phase $\sum_i x_ix_{i+1}$ and iterated
+Parseval in Alp\"oge's account of his proposed RH argument
+\cite[p.~3, footnote 3]{alpoge}. We ask what survives on branching paths,
+with singular edge coefficients and worst-case local perturbations.
+The proofs here use finite Fourier analysis and bipartite linear
+programming.
+
+Let $T=(V,E)$ be a finite nonempty tree, $p$ a prime, $k\ge1$, and
+$R=\Z/p^k\Z$. Write $\ee_m(t)=\exp(2\pi i t/m)$. Choose $a_e\in R$
+on each edge. Write $p^{w_e}$ for the additive order of $a_e$ in $R$,
+with $w_e=0$ for $a_e=0$. Define
+\[
+ W(T,a)=\max_{\substack{L\subseteq E\\ \deg_L(v)\le2\ (v\in V)}}
+                \sum_{e\in L}w_e.
+\]
+Each feasible $L$ is a disjoint union of paths, with isolated vertices
+allowed. All expectations below are uniform over the indicated finite
+sets and all input coordinates are independent.
+
+\begin{theorem}\label{thm:ring}
+For arbitrary complex vertex functions $f_v$ of modulus one,
+\[
+ \max_{(f_v)}
+ \abs{\E_{x\in R^V}
+  \ee_{p^k}\!\left(\sum_{uv\in E}a_{uv}x_ux_v\right)
+  \prod_{v\in V}f_v(x_v)}
+     =p^{-W(T,a)/2}.
+ \tag{1}
+\]
+The same maximum holds for $|f_v|\le1$. For odd $p$ it is attained with
+every $f_v$ taking values in the $p^k$-th roots of unity.
+\end{theorem}
+
+For example, on a star over $\Z/27\Z$ with coefficients $1,3,9,9$,
+the two heaviest spokes have weights $3$ and $2$. The exact maximum
+is $3^{-5/2}$. Any number of additional spokes of weight at most two
+gives the same maximum. On a path every edge contributes its full weight.
+
+\section{Upper bound by eliminating paths}
+For $a\in R$ of order $d=p^w$, put
+\[
+ K_a g(x)=\E_{y\in R}\ee_{p^k}(axy)g(y).
+\]
+On $L^2(R)$ with normalized counting measure, $K_a^*K_a$ is
+$d^{-1}$ times the orthogonal projection onto functions constant on
+cosets of $dR$. Indeed, averaging the character in $x$ gives
+$\mathbf1_{y-z\in dR}$. Thus $\norm{K_a}_{2\to2}=d^{-1/2}$,
+including the case $a=0$. A normalized sum on a path is a matrix
+coefficient of a product of these operators, alternating with
+multiplication by the interior vertex functions. The endpoint functions
+have $L^2$ norm at most one and the multipliers have operator norm at
+most one. Its modulus is at most $\prod_{e\text{ on path}}p^{-w_e/2}$.
+For a singleton the bound is one.
+
+Fix any feasible $L$ and contract each component of $(V,L)$ to a point.
+The result is a tree. A leaf component therefore meets the rest through
+one edge $uv$, with $u$ inside and $v$ outside. For fixed $x_v$, its
+edge phase is just another multiplier at $u$. Averaging the leaf
+component gives a function of $x_v$ bounded by the path estimate,
+uniformly in $x_v$. Divide out that bound, absorb the resulting function
+into $f_v$, and repeat. The last path has the same estimate. Multiplying
+the bounds and maximizing the retained weight proves the upper bound
+in (1).
+
+\section{Attainment from the dual problem}
+Write $t_+=\max(t,0)$. The required combinatorial identity is
+\[
+ W(T,a)=\min_{s_v\in\{0,\ldots,k\}}
+ \left(2\sum_v s_v+\sum_{uv\in E}(w_{uv}-s_u-s_v)_+\right).
+ \tag{2}
+\]
+Indeed, relax the indicators of the retained edges to $0\le z_e\le1$
+and impose $\sum_{e\ni v}z_e\le2$. The vertex-edge incidence matrix of
+a tree is totally unimodular because changing the signs of rows in one
+bipartition class gives a directed incidence matrix. Appending unit
+rows, transposing, and changing signs preserve total unimodularity.
+Hence both this primal program and its dual have integral optimal
+vertices for the integral data here \cite{schrijver}. The dual minimizes
+$2\sum_v s_v+\sum_e t_e$ subject to $s_u+s_v+t_e\ge w_e$ and
+$s_v,t_e\ge0$. Eliminating $t_e$ gives (2), since lowering any
+$s_v>k$ to $k$ preserves feasibility.
+
+Choose a minimizer $s$ and first allow $|f_v|\le1$. Support $f_v$ on
+$p^{s_v}R$, whose density is $p^{-s_v}$. Conditional on this event
+we may write $x_v=p^{s_v}y_v$ with $y_v$ uniform on $R$. Now edge $uv$
+has coefficient $b_e=p^{s_u+s_v}a_e$, of order
+$d_e=p^{(w_e-s_u-s_v)_+}$.
+
+For any $b\in R$ of order $d$ use an even, unimodular function $c_b$ on
+$\Z/d\Z$ satisfying
+\[
+ c_b(y-z)=c_b(y)c_b(z)\ee_{p^k}(byz),\qquad
+ \abs{\E_y c_b(y)}=d^{-1/2}. \tag{3}
+\]
+Here is an explicit construction. Set $c_0=1$. Otherwise write
+$b/p^k=u/d$ modulo one with $u$ coprime to $d$. For odd $d$ take
+$c_b(y)=\ee_d(-u\,2^{-1}y^2)$ with inverse in $\Z/d\Z$. For even $d$
+take $c_b(y)=\exp(-\pi i u y^2/d)$, which has period $d$ since $d$ is
+even. Expanding the square gives the first identity. For the second,
+square the modulus of the average, write the two arguments as $y+h,y$,
+and sum first in $y$. Orthogonality leaves only $h=0$ modulo $d$.
+
+On the chosen subgroup define
+\[
+ f_v(p^{s_v}y_v)=\prod_{e\ni v}c_{b_e}(y_v).
+\]
+This is well defined because every incident $d_e$ divides $p^{k-s_v}$.
+By (3) the whole integrand on the subgroups becomes
+$\prod_{uv\in E}c_{b_e}(y_u-y_v)$. A root coordinate together with the
+oriented edge differences gives a bijective change of variables on a
+tree. The differences are thus independent and uniform. Including the
+densities of the subgroups, the magnitude of the original average is
+\[
+ p^{-\sum_v s_v}\prod_e d_e^{-1/2}=p^{-W(T,a)/2}
+\]
+by (2).
+
+\paragraph{Freedom away from the subgroups.}
+In fact \emph{every} unimodular filling of the zero entries gives the
+same complex sum. To see this, take any proposed filling and multiply
+each of its off-subgroup entries by an independent uniform sign. The
+expected complex sum is the subgroup sum, by multilinearity. Each
+realization lies in the closed disk of radius $p^{-W(T,a)/2}$ and its
+mean lies on the boundary. All realizations must therefore coincide,
+including the original filling. For odd $p$ the prescribed entries
+are $p^k$-th roots, so filling every zero with one also proves the last
+claim of Theorem~\ref{thm:ring}.
+
+In the example modulo $27$, take $s_v=2$ at the center and zero at every
+leaf. The construction prescribes the center phase only at $0,9,18$.
+One can change its other $24$ values independently while retaining
+exactly the same extremal sum.
+
+\newpage
+\section{A collision law over odd finite fields}
+Let $q$ be an odd prime power, let every $a_{uv}\in\F_q^\times$, and put
+\[
+ F_g(x)=\sum_{uv\in E}a_{uv}x_ux_v+\sum_{v\in V}g_v(x_v),
+ \qquad g_v:\F_q\longrightarrow\F_q.
+\]
+Write $P(T)$ for the minimum number of vertex-disjoint paths covering
+$V$, allowing singleton paths, and $r=|V|-P(T)$. Equivalently, $r$
+is the maximum number of edges retained in a linear forest in $T$.
+
+\begin{theorem}\label{thm:collision}
+For independent uniform $X,Y\in\F_q^V$,
+\[
+ \max_g\Pr[F_g(X)=F_g(Y)]
+     =\frac1q+\left(1-\frac1q\right)q^{-r}. \tag{4}
+\]
+A single family of quadratic vertex functions attains the maximum
+for every nontrivial additive character simultaneously.
+\end{theorem}
+
+\begin{proof}
+For each nontrivial additive character $\chi$ of $\F_q$, the normalized
+edge transform with kernel $\chi(a xy)$ has norm $q^{-1/2}$ whenever
+$a\ne0$, by orthogonality. Path elimination gives
+$|\E\chi(F_g(X))|\le q^{-r/2}$ for every $g$. Orthogonality again gives
+\[
+ \Pr[F_g(X)=F_g(Y)]=q^{-1}\sum_{\chi}\abs{\E\chi(F_g(X))}^2.
+\]
+For simultaneous attainment, apply (2) with every weight and $k$ equal
+to one. It provides a subset $S$ with $2|S|+|E(T-S)|=r$ (take $S$ to
+be the vertices with $s_v=1$). At $v\notin S$ choose
+\[
+  g_v(t)=-\tfrac12 t^2\sum_{u:\,uv\in E(T-S)}a_{uv},
+  \qquad g_v=0\quad\text{on vertices in }S.
+\]
+Write the resulting form as $F_g(x)=\tfrac12 x^\mathsf{T}Bx$.
+Its restriction to $x_S=0$ is
+$-\tfrac12\sum_{uv\in E(T-S)}a_{uv}(x_u-x_v)^2$ and has rank
+at most $|E(T-S)|$. Restoring $|S|$ rows and $|S|$ columns raises the
+rank by at most $2|S|$, so $\operatorname{rank} B\le r$.
+For each nontrivial $\chi$, differencing at $x+h$ and $x$ and averaging
+in $x$ leaves exactly $h\in\ker B$. For such $h$ the residual phase is
+one, so $|\E\chi(F_g(X))|^2=q^{-\operatorname{rank} B}$. The upper bound
+forces $\operatorname{rank} B=r$ and gives equality in (4).
+\end{proof}
+
+For a star with $m\ge2$ arms of length two, one can retain all $m$
+outer edges and exactly two inner edges. Thus $r=m+2$. In particular,
+over $\F_3$ with four arms, the highest possible probability that two
+outputs agree is $731/2187$, just $2/2187$ above the uniform baseline.
+The maximum ranges over every choice of the nine local functions.
+
+The tree hypothesis matters already on a triangle. Give its three
+edges coefficient one and take $g_v(t)=t^2/2$. The resulting phase
+polynomial is $(x_1+x_2+x_3)^2/2$, so its bias at a nontrivial character
+has magnitude $q^{-1/2}$. This is sharp by conditioning on $x_3$ and
+applying the single-edge estimate. The two edges of a spanning path
+would have predicted $q^{-1}$ if the tree formula extended unchanged.
+
+The equality between tree minimum rank and $|V|-P(T)$ is classical
+\cite[Thm.~2.2]{chenette}. Its role here is visible in the quadratic
+extremizer. The upper bound covers arbitrary vertex functions, and (1)
+also accounts for interactions of different conductors. These are
+research notes. Priority for the exact extremal formulas is unverified.
+
+\begin{thebibliography}{9}
+\bibitem{alpoge} L. Alp\"oge, \href{https://alpo.ge/remark.pdf}{announcement
+on the Riemann hypothesis}, 20 November 2026.
+\bibitem{schrijver} A. Schrijver,
+\href{https://www-users.cse.umn.edu/~reiner/Classes/Schrijver2004.pdf}
+{\emph{A Course in Combinatorial Optimization}}, sections on bipartite
+matching and total unimodularity.
+\bibitem{chenette} N. L. Chenette, S. V. Droms, L. Hogben, R. Mikkelson,
+and O. Pryporova, \href{https://emis.de/ft/34661}{Minimum rank of a graph
+over an arbitrary field}, \emph{Electronic Journal of Linear Algebra}
+16 (2007), 183--186.
+\end{thebibliography}
+\end{document}

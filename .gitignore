@@ -1,0 +1,5 @@
+lean.tar.gz
+*:Zone.Identifier
+lean/src/*/
+__pycache__/
+*.pyc

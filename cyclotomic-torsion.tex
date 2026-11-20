@@ -1,0 +1,252 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,hmargin=0.92in,vmargin=0.82in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{1.2em}
+\newtheorem{theorem}{Theorem}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\Q}{\mathbb Q}
+\newcommand{\F}{\mathbb F}
+\newcommand{\Cl}{\operatorname{Cl}}
+\newcommand{\Gal}{\operatorname{Gal}}
+\newcommand{\len}{\operatorname{length}}
+\newcommand{\Sel}{\operatorname{Sel}}
+\newcommand{\avref}[2]{\href{run:lean/src/Development/AutomorphicArithmetic/AutomorphicVarieties/#1.lean}{\texttt{#2}}}
+\newcommand{\denseref}[2]{\avref{ModularityArgument/ThresholdArguments/DenseThresholdCases/#1}{#2}}
+\title{A rank-three congruence bound for the higher \(K\)-groups of \(\Z\)}
+\date{}
+\author{}
+\begin{document}
+\maketitle
+\vspace{-3.8em}
+
+\begin{abstract}
+We extract a fixed-level consequence from the rank-three congruence argument in
+Alp\"oge's November 2026 Lean archive. With its arithmetic inputs, we obtain
+$\log |K_{4m}(\Z)|\ll(m+1)^7$ and the simultaneous vanishing of a growing
+interval of even class-group eigenspaces at every layer of a cyclotomic tower.
+The exponent comes from six powers for the coefficient system and one for
+the height of a Frobenius trace. This is a mathematical deduction from the
+archived inputs. The dependency closure and the deductions here have not
+been independently kernel-checked in this study.
+\end{abstract}
+
+\section{The conclusions and their input}
+For an odd prime $\ell$, write $A_{\ell,n}$ for the $\ell$-primary class group of $\Q(\zeta_{\ell^n})$
+and $\omega$ for the Teichm\"uller character of its subgroup of order $\ell-1$
+in the cyclotomic Galois group.
+
+\begin{theorem}\label{main}
+Using the rank-three comparison and cohomological counting inputs in the
+archive, there is an absolute $C$ such that, for all $m\ge1$,
+\[
+                 \log |K_{4m}(\Z)|\le C(m+1)^7.
+\]
+For $X\ge3$ and $E\ge2$, the number of primes $\ell\in[X,2X]$ for which
+$A_{\ell,n}^{\,\omega^{-e}}\ne0$ for some $n\ge1$ and some even
+$2\le e\le E$ is $O((E+1)^8/\log X)$. In particular, outside a set
+of primes with convergent reciprocal sum, for every $n\ge1$,
+\[
+ A_{\ell,n}^{\,\omega^{-e}}=0\qquad
+ \text{for every even }2\le e\le(\ell/\log\ell)^{1/8}.
+\]
+\end{theorem}
+
+The Dirichlet proof in
+\href{run:lean/src/Development/AutomorphicArithmetic/CharacterBoxes/MainConclusion.lean}{\texttt{MainConclusion}}
+calls the automorphic window. Its proof combines four estimates in
+\denseref{WindowBoundOfLiteratureLevel}{the window lemma}. The first, constructed in
+\denseref{LinkedUnlE}{LinkedUnlE}, calls both
+\denseref{FOneCharU}{FOneCharU} and \denseref{FPropGKU}{FPropGKU}.
+The former bounds a Selmer length by valuations of differences of Frobenius
+traces on rank-three representations. It passes through a deformation model
+and counts inequivalent specializations. The latter puts the necessary
+trace differences into one rational integer, simultaneously for all
+coefficient primes away from the test prime. The zero-free theorem itself
+is unnecessary for what follows.
+
+The convenient specialization is $K=\Q(\sqrt{-3})$, character level $N=2$,
+and the trivial character. In
+\avref{SmallClassNumbers/ClassNumberThree}{ClassNumberThree},
+the class number one of $K$ verifies the geometric hypotheses in
+\texttt{gd} for every even $e\ge2$ and every \emph{good} prime $\ell$, meaning
+$\ell\ge5$ and $\ell-1\nmid 2e$. At coefficients $\Z_\ell$ the normalization
+by the absolute ramification index is one. The archive's
+\avref{SmallClassNumbers/CorGKOf}{CorGKOf} already gives an unspecified
+polynomial bound for the sum of these lengths weighted by $\log\ell$.
+Sections 2 and 3 recover the explicit exponent and identify the full orders.
+
+\newpage
+\section{What the Frobenius integer actually measures}
+Fix $p=7$ or $11$ and a place $w$ of $K$ over $p$. Put $q=Nw$, so $q=7$ or
+$121$, respectively. In the trivial-character specialization the comparison
+trace is $q^{-e}+1+q^e$. The construction in
+\avref{BuildingsResidueChars/FrobeniusTraceNormNonzeroLogBound}{FrobeniusTraceNormNonzeroLogBound}
+forms an integer of the shape
+\[
+ B_{p,e}=\prod_{s\in D_{p,e}}
+ q^e\bigl(t_s-(q^{-e}+1+q^e)\bigr).
+ \tag{1}
+\]
+Here $D_{p,e}$ is a finite indexing set for systems, with possible repetitions
+of their traces at $w$. The factors are integral and Galois-permuted. Since
+$|t_s|\le3$ and $q\ge7$, none vanishes. Each factor has logarithmic
+absolute value at most $2e\log q+1$. The comparison in
+\denseref{FPropGKU}{FPropGKU}, as stated in
+\avref{UnitaryThreeGroups/KatoUse}{PropGK}, gives for every good $\ell\ne p$
+\[
+ \len_{\Z_\ell}\Sel_{\ell,e}\ \le\ 2v_\ell(B_{p,e}).
+ \tag{2}
+\]
+Here $\Sel_{\ell,e}$ is defined on page 3. The set $D_{p,e}$ combines the
+rank-three CM systems at level $2$ and the rational rank-two systems at
+level $2|\operatorname{disc}K|=6$, embedded in rank three.
+
+\paragraph{Keeping weight separate from level.}
+In \denseref{TCardK}{TCardK} and \denseref{BrCardP}{BrCardP}, line 30 in
+each, the number of systems up to isomorphism is bounded by
+$c M^a\dim\Xi$. This follows from the cohomological realization and the
+fixed-level cohomology bound. Keep $M$ fixed here. The proof then needs the
+dimension of a coefficient system of the indicated infinitesimal character.
+For a decreasing integral parameter $b=(b_1,\dots,b_r)$ the single-embedding
+factor can be chosen irreducible, of dimension
+\[
+             \prod_{i<j}\frac{b_i-b_j}{j-i}.
+ \tag{3}
+\]
+Indeed the highest weight in \denseref{TWeylC}{TWeylC} is, with zero-based
+indices, $\nu_k=k+1+H-b_{r-1-k}$. Substitution in the Weyl dimension
+formula gives (3). A common determinant twist does not affect it. The
+irreducible highest weight module supplies the scalar central character used
+there. The tensor construction takes one factor per embedding, as recorded in
+\avref{GaloisLibrary/WeylCharacterRegularity/ExistsTens}{ExistsTens}.
+
+The actual rank-three parameter is $(e-1,-1,-e-1)$. Formula (3) gives $e^3$
+at each of the two embeddings, hence $e^6$. For rank two the parameter
+$(e,-e)$ gives $2e$ per embedding. The rational classification in
+\denseref{FrobeniusTraceCountBoundOfCmEigensystemCount}{countQ\_alt}
+restricts to a fixed finite list of imaginary quadratic fields, at the same
+level. Its \avref{GaloisLibrary/CrystallineBaseChange/RootSum}{rootSum}
+construction takes a disjoint union, with at most $2^r$ choices of
+residue-degree roots and a binary label per system. Thus the rank-two count
+is $O(e^2)$. The conversions from eigenvalues to traces preserve the index
+cardinalities (lines 348 and 418 onward of the same count file).
+\denseref{KeepNumU}{KeepNumU} takes the disjoint union of the two lists.
+Consequently $|D_{p,e}|\ll e^6+e^2$ and (1) gives
+\[
+                   \log|B_{p,e}|\ll(e+1)^7 .
+ \tag{4}
+\]
+
+\newpage
+\section{The Selmer group, including the omitted primes}
+Set $D=\Q_\ell/\Z_\ell(-e)$ and $T=\Z_\ell(e+1)$. The definition of
+\avref{GaloisLibrary/SelmerTransport/ConjStableShaFam}{shaFam} and its
+specialization in \avref{SmallClassNumbers/LenEqZeroIff}{LenEqZeroIff}
+identify $\Sel_{\ell,e}\subset H^1(\Q,D)$ as the classes unramified at
+every finite prime and locally zero at $2$ and $\ell$. Write
+$S=\{\ell,\infty\}$ and $G_S$ for the Galois group of the maximal
+extension of $\Q$ unramified outside $S$. For odd $\ell$ and $e>0$,
+\[
+ \Sel_{\ell,e}=\ker\big(H^1(G_S,D)\longrightarrow H^1(\Q_\ell,D)\big).
+ \tag{5}
+\]
+Indeed $D$ is unramified away from $\ell$, so a cocycle trivial on
+inertia there factors through $G_S$. The real place contributes no
+positive-degree cohomology. At $2$ an unramified class belongs to
+$D/(\mathrm{Frob}_2-1)D=0$, since $2^{-e}-1$ is nonzero and multiplication
+by it is surjective on $D$. Local triviality at $\ell$ implies the required
+inertia condition there.
+
+Poitou--Tate duality identifies the dual of (5) with the localization kernel
+in $H^2(G_S,T)$ \cite[eq.~(22)]{banaszak}. Local Tate duality identifies
+the target $H^2(\Q_\ell,T)$ with $H^0(\Q_\ell,D)^\vee$. For good $\ell$
+this target is zero: the residual cyclotomic character on $G_{\Q_\ell}$
+is surjective and $\ell-1\nmid e$. Quillen--Lichtenbaum then gives
+\cite[Thm.~70]{weibel}
+\[
+       \len_{\Z_\ell}\Sel_{\ell,e}
+       =\len_{\Z_\ell}H^2(G_S,T)
+       =v_\ell\bigl(|K_{2e}(\Z)|\bigr).
+ \tag{6}
+\]
+Thus (2) bounds prime-power multiplicities.
+
+It remains to account for primes omitted by (2). For every odd $\ell$ the
+standard mod-$\ell$ comparison \cite[Thm.~5.1]{jkpsz} gives
+\[
+ K_{2e}(\Z)/\ell \ \simeq\
+ \bigl(\Cl(\Q(\zeta_\ell))/\ell\bigr)^{\omega^{-e}}. \tag{7}
+\]
+When $\ell-1\mid2e$ the character on the right is trivial or quadratic.
+The trivial part comes from $\Cl(\Q)=0$. In the quadratic case
+$e$ is even, hence $\ell\equiv1\bmod4$ and the eigenspace comes from
+$\Q(\sqrt{\ell})$. In both cases the descent assertion follows from the
+norm and extension of ideals, since the extension degree is prime to $\ell$.
+Minkowski supplies an integral ideal of norm at most $\sqrt{\ell}/2$ in
+each real quadratic ideal class. There are at most $\tau(j)\le j$ ideals
+of norm $j$, so $h(\Q(\sqrt\ell))<\ell$. The quadratic part is zero as
+well. This includes all the needed cases at $3$ through the trivial
+character. In degree $2e$ divisible by four the $2$-part is zero
+\cite{rognes}. Finally $7$ and $11$ are regular primes, as is seen from
+$B_2,B_4,B_6,B_8$ and Kummer's criterion, so (7) rules out both.
+The groups in question are finite. Combining (2) and (6) at every
+possible divisor gives the more precise statement
+\[
+        |K_{2e}(\Z)|\ \mid\ \gcd(|B_{7,e}|,|B_{11,e}|)^2
+        \qquad (e\ge2\text{ even}). \tag{8}
+\]
+Taking $e=2m$ in (4) and (8) proves the first assertion. The construction
+gives existence and a height bound for the integers. Numerical values of
+the trace products have not been computed here.
+
+\newpage
+\section{A growing interval throughout the cyclotomic tower}
+By (7), $A_{\ell,1}^{\omega^{-e}}\ne0$ exactly when $\ell$ divides
+$|K_{2e}(\Z)|$. The unique prime over $\ell$ is totally ramified throughout
+the cyclotomic $\Z_\ell$-extension. The norm control theorem therefore
+identifies the $\Gamma_n$-coinvariants of the unramified Iwasawa module
+$X_\infty$ with $A_{\ell,n}$, where $\Gamma_n$ fixes $\Q(\zeta_{\ell^n})$
+\cite[chapter~3]{sharifi}. All maps respect the prime-to-$\ell$ character
+action. In particular if the $\omega^{-e}$ part at the bottom is zero,
+the same part of $X_\infty$ has zero $\Gamma_1$-coinvariants.
+Nakayama's lemma over $\Z_\ell[[\Gamma_1]]$ gives its vanishing, hence
+vanishing at every level. The usual finite generation of the unramified
+Iwasawa module suffices for this application.
+
+Every exceptional prime in $[X,2X]$ thus divides the single integer
+\[
+                    \prod_{\substack{2\le e\le E\\ e\ {\rm even}}}
+                           |K_{2e}(\Z)|.
+\]
+The logarithm of this integer is $O((E+1)^8)$ by (4) and (8). Each
+distinct exceptional prime costs at least $\log X$, proving the claimed
+count. For the displayed window of Theorem~\ref{main}, take
+$E=(2X/\log X)^{1/8}$ on each dyadic interval. The exceptional count is
+$O(X/(\log X)^2)$, giving a convergent sum of reciprocals and relative
+natural density zero among primes. For an individual prime, (4) and (8)
+also force vanishing whenever $\log\ell>C'(e+1)^7$.
+
+\paragraph{Which characters this reaches.}
+The exponent $-e$ means the even characters with representatives just below
+$\ell-1$. Chen et al.\ obtain a density-one result for the even characters
+with small \emph{positive} exponents, up to $\sqrt{\ell}/(\log\ell)^\alpha$
+for $\alpha>1/2$ \cite{chen}. The two intervals can be imposed on the
+same density-one set of primes. Soul\'e treated the negative-exponent
+direction for individual primes, with a threshold
+$\log\ell>n^{224n^4}$ for $n=e+1$ in his notation \cite{soule}.
+The source-level exponent $7$ above is an upper estimate. Its optimality
+and the priority of these deductions are open in this note.
+
+\small
+\begin{thebibliography}{10}
+\bibitem{alp} L. Alp\"oge, \href{https://alpo.ge/remark.pdf}{announcement and Lean archive}, 20 November 2026. The typewriter links above point into the supplied local source tree.
+\bibitem{banaszak} G. Banaszak, \href{https://arxiv.org/abs/1208.2137}{Wild kernels and divisibility in \(K\)-groups of global fields}.
+\bibitem{weibel} C. Weibel, \href{https://sites.math.rutgers.edu/~weibel/papers-dir/KZsurvey-published.pdf}{Algebraic \(K\)-theory of rings of integers in local and global fields}.
+\bibitem{jkpsz} B. Jordan, Z. Klagsbrun, B. Poonen, C. Skinner and Y. Zaytman, \href{https://arxiv.org/abs/1703.00108}{Statistics of \(K\)-groups modulo \(p\) for the ring of integers of a varying quadratic number field}.
+\bibitem{rognes} J. Rognes and C. Weibel, \href{https://sites.math.rutgers.edu/~weibel/archive/papers-dir/RognesWeibel.pdf}{Two-primary algebraic \(K\)-theory of rings of integers in number fields}.
+\bibitem{sharifi} R. Sharifi, \href{https://math.ucla.edu/~sharifi/notes/iwasawa-ch03.html}{Iwasawa Theory}, chapter 3, limits of class groups.
+\bibitem{chen} E. Chen et al., \href{https://arxiv.org/abs/2602.05090}{Almost all primes are partially regular}.
+\bibitem{soule} C. Soul\'e, \href{https://arxiv.org/abs/math/9812171}{Perfect forms and the Vandiver conjecture}.
+\end{thebibliography}
+\end{document}
