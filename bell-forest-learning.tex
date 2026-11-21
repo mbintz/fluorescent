@@ -1,0 +1,244 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.94in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[hidelinks]{hyperref}
+\newtheorem*{theorem}{Theorem}
+\newcommand{\F}{\mathbb F_2}
+\newcommand{\ket}[1]{\lvert #1\rangle}
+\newcommand{\supp}{\operatorname{supp}}
+\title{Learning the wiring of a phase-rotated cluster state}
+\author{}\date{}
+\begin{document}
+\maketitle
+\vspace{-2.8em}
+Suppose a source produces copies of a linear cluster state. The qubit
+labels are scrambled and each qubit has an unknown $Z$ rotation. Can we
+recover the order along the chain? A two-copy measurement learns every
+edge with $O(\log(n/\delta))$ copies at failure probability $\delta$.
+The same protocol learns any labeled forest, even with unbounded degree.
+On an arbitrary graph it returns the 2-core and all edges outside that core.
+
+The inspiration is the path phase $\sum_i x_ix_{i+1}$ with arbitrary
+one-site factors in the supplied account of an RH argument \cite{remark}.
+Here a second copy of the phase cancels one-site factors at a random
+set of vertices, and a finite Fourier transform reads their neighbor parities.
+The algorithm uses no hypothesis about $L$-functions.
+
+\section*{1. A two-copy measurement}
+Let $G$ be an unknown simple labeled graph on $n$ vertices with adjacency
+matrix $A$ over $\F$. Write $Q_G(x)=\sum_{uv\in E(G)}x_ux_v$. One input is
+\[
+ \ket{\psi_{G,\theta}}=2^{-n/2}\sum_{x\in\F^n}
+ (-1)^{Q_G(x)} e^{i\sum_v\theta_v x_v}\ket{x}.
+\]
+Every one-qubit diagonal unitary has this form up to a global phase. The
+basic model supplies independent measurement rounds with the same unknown
+$G$. Each round supplies a pair with identical angles. The angles may
+change arbitrarily between rounds. A device can prepare a copy with
+$n$ Hadamards, one CZ per edge and at most $n$ one-qubit phase gates.
+The learning problem gives access to the source while hiding its wiring.
+
+At each vertex apply a CNOT from the first copy to the second and a
+Hadamard to the first. Read the second result as $s_v$, the first as $t_v$.
+All $n$ CNOTs run in parallel. This is an ordinary Bell measurement on
+corresponding pairs of qubits.
+\begin{theorem}
+The string $s$ is uniform on $\F^n$. At every site with $s_v=1$,
+\[
+ t_v=(As)_v=\big|N(v)\cap\supp(s)\big|\pmod 2
+\]
+with probability one, for every choice of the angles.
+\end{theorem}
+\begin{proof}
+Conditional on the second readout $s$, the two inputs to the phase were
+$x$ and $x+s$. Their binary quadratic phases add to
+$Q_G(s)+(As)\cdot x$. At site $v$ with $s_v=1$ the two unary factors
+multiply to $e^{i\theta_v}$ independently of $x_v$. The remaining
+wavefunction factorizes across $v$. At such a site the first qubit is
+$Z^{(As)_v}\ket{+}$, so the Hadamard returns $(As)_v$. The equal
+input magnitudes give $\Pr(s)=2^{-n}$.
+\end{proof}
+For a three-site path with middle vertex 2, $s=(1,1,0)$ returns $t_1=t_2=1$.
+The third readout can be discarded. A full measurement round uses $2n$
+qubits, $n$ inter-copy CNOTs, $n$ Hadamards and computational readout.
+
+\newpage
+\section*{2. A decoder that tolerates missing parities}
+Take $r$ Bell rounds. For vertex $v$ store the $r$-bit fingerprint $c_v$ of
+its mask bits. Store $y_v$, its $r$ output bits with entries zeroed wherever
+$c_v$ is zero. The bitwise AND is denoted by $\mathbin{\&}$.
+With all vertices initially active, place their labels on a queue.
+\begin{enumerate}
+\item Pop an active $v$. If $y_v=0$, remove it as an isolated vertex.
+\item Otherwise look for an active $w\ne v$ with $y_v=c_v\mathbin{\&}c_w$.
+If one exists, record $vw$, remove $v$, update
+$y_w\gets y_w\mathbin{\oplus}(c_v\mathbin{\&}c_w)$, and append $w$ to the queue.
+\item If neither test applies, leave $v$ active. At termination return all
+recorded edges and the set of surviving vertices.
+\end{enumerate}
+Skipped inactive queue entries have no effect. On the success event,
+the updated $y_v$ always refers to neighbors in the remaining graph.
+
+\begin{theorem}
+For $0<\delta<1$ the decoder succeeds with probability at least $1-\delta$ if
+\[
+ r\ \ge\ \frac{\log(2n^2/\delta)}{\log(4/3)} .
+\]
+In a forest it returns the exact edges. For every graph it returns the
+maximal induced subgraph of minimum degree at least two as a vertex set,
+and every edge with at least one endpoint outside that set. In particular
+it decides whether the input graph has a cycle.
+\end{theorem}
+\begin{proof}
+Fix the queue trajectory of a decoder that knows the graph and removes
+only genuine isolated vertices and leaves. Its trajectory is independent
+of the random masks. At most $n$ labels are queued initially, and at most
+$n$ more are queued, one per deleted leaf. At any such test let $N$ be
+the true residual neighborhood of $v$ and let $C$ be an incorrect
+candidate, either empty or a singleton excluding $v$. A single round
+refutes $C$ exactly when $s_v=1$ and the parity of $s$ on
+$N\mathbin{\triangle}C$ is odd. Those are independent fair bits because
+$N\mathbin{\triangle}C$ is nonempty and excludes $v$. Thus $C$ survives
+all rounds with probability $(3/4)^r$. There are at most $n$ candidates
+per test. A union bound over this fixed trajectory gives the result
+without assuming independence after an adaptive deletion. When all
+incorrect candidates fail, the two decoder trajectories coincide.
+\end{proof}
+The reference implementation uses $O(nr)$ bits for the observations and
+$O(n^2)$ comparisons of $r$-bit words for the forest decoder. The latter
+is a bound of $O(n^2r)$ bit operations. The randomness and all quantum
+measurements precede decoding.
+
+\paragraph{Copy lower bound.}
+There are $M=n^{n-2}$ labeled trees. On $k$ copies the Hilbert space has
+dimension $2^{nk}$. On uniform inputs any measurement has mean success
+at most $2^{nk}/M$, since each density matrix is at most the identity and
+the measurement operators sum to the identity. Even clean states therefore
+require $\Omega(\log n)$ copies for constant success. Already the $n!/2$
+labeled paths give the same order. Section 3 supplies the confidence
+lower bound in the paired-phase model.
+
+\newpage
+\section*{3. What the measurement preserves}
+Suppose each pair shares uniformly random angles, independent across sites
+and freshly drawn for the next pair. Averaging a single copy gives the
+maximally mixed state for every $G$. The averaged two-copy states for
+\emph{all} graphs are diagonal in the same vertexwise Bell basis.
+In fact, with $S=\supp(s)$ their diagonal entries are exactly
+\[
+ P_G(s,t)=2^{-n}2^{-(n-|S|)}\,\mathbf1_{\{t_S=(As)_S\}} .
+\]
+To see the diagonalization, average each phase before the Hadamards.
+Only amplitudes with the same two-copy occupation at every site retain
+coherence. Different $s$ have different occupation parities. At $s_v=0$
+the two occupations 0 and 2 dephase, leaving a maximally mixed qubit.
+At $s_v=1$ the occupation is 1 in both branches, giving the pure parity
+bit of Section 1 after the Hadamard. Consequently no joint measurement
+on any number of independently randomized pairs improves on Bell readout
+followed by optimal classical inference.
+
+For two specified graphs $G,H$ with equal prior probabilities let
+$D=G\triangle H$ be their edgewise symmetric difference. Conditional
+on $S$, the outcome laws are identical or disjoint. They are identical
+exactly when every vertex of $D[S]$ has even degree. The optimal
+discrimination error for $r$ pairs is therefore
+\[
+ \frac12\left(2^{-n}\#\{S\subseteq V: D[S]\text{ has all degrees even}\}\right)^r.
+\]
+If $D$ is a forest, these $S$ are exactly its independent sets. For two
+graphs differing in one edge, the error is $(3/4)^r/2$. This proves
+$\Omega(\log(1/\delta))$ pairs for worst-case error $\delta$ in the model
+that allows phases to vary between pairs. With the counting bound, the
+forest copy complexity is $\Theta(\log n+\log(1/\delta))$ for
+$0<\delta\le1/3$ and $n\ge2$.
+
+\paragraph{Drift between the two copies.}
+Let the two phase vectors be $\alpha,\beta$. Conditional on $s$, the
+readouts are independent bits with
+\[
+ \Pr(t_v\ne(As)_v\mid s)
+    =\sin^2\!\big((\alpha_v+(-1)^{s_v}\beta_v)/2\big).
+\]
+Thus on a retained site only the phase difference matters. If the phases
+are chosen independently of the masks, with
+$\sin^2((\alpha_v-\beta_v)/2)\le q<1/2$, count mismatches against each
+candidate across all rounds, counting unretained rows as zero.
+The mean per round is at most $q/2$ for the true candidate and $1/4$
+for a wrong one. Accept at most $r(1+2q)/8$ mismatches. Hoeffding's
+inequality and the same ideal trajectory give failure probability at most
+$2n^2\exp[-r(1-2q)^2/32]$ for independent rounds. Earlier deleted
+neighbors are subtracted exactly, preserving the bit error on each row.
+
+\paragraph{Higher degeneracy.}
+For a fixed $d\ge1$ test all neighbor sets of size at most $d$. Whenever a
+test succeeds remove the vertex and update those neighbors. The ideal
+trajectory has at most $(d+1)n$ tests, with
+$\sum_{j=0}^d\binom{n-1}{j}$ candidates each (truncate at $n-1$).
+The same argument learns the fringe of the $(d+1)$-core. For
+$1\le d\le n/4$ this takes $O(d\log(en/d)+\log(n/\delta))$ pairs.
+Naive decoding enumerates the candidates and is polynomial for fixed $d$.
+
+\newpage
+\section*{4. A coherent-query implementation and its comparison model}
+In the standard induced-subgraph parity model, a classical query on $x$
+returns the single bit $Q_G(x)$. Its coherent counterpart supplies the
+diagonal phase $(-1)^{Q_G(x)}$. Applying it to $\ket{+}^{\otimes n}$
+prepares one clean input copy in one call. Thus the paired algorithm gives
+$O(\log(n/\delta))$ coherent calls. In contrast $q$ classical binary
+queries have at most $2^q$ transcripts per fixed random seed. Uniform
+labeled trees imply $q\ge\log_2((1-\delta)n^{n-2})$ at worst-case error
+$\delta$. This is a query separation under that access model. The copy
+bound assumes a physical state source and counts neither a supplied
+adjacency list nor data loaded into quantum memory.
+
+\paragraph{Faster decoding with a callable phase gate.}
+Even with unknown unary phases a forward-only oracle allows complete
+fingerprints. For a chosen $S$, prepare $\ket{+}$ on $S$ and $\ket0$ on
+its complement. Apply the oracle, flip all bits in $S$, apply the oracle
+again with the same unary angles, undo the flips, and measure $S$ in the
+$X$ basis. The unary phases cancel up to a constant. Every edge in
+$G[S]$ contributes
+$x_ux_v+(1-x_u)(1-x_v)=1+x_u+x_v\bmod2$. Thus all active vertices
+return their degrees within $S$ modulo two. Once at the start obtain
+$A\mathbf1$ by taking $S=V$. For each random mask $s$, run the experiment
+on $S$ and its complement. On the complement use
+$As=A\mathbf1+A(\mathbf1+s)$ to recover the missing rows.
+This costs $4r+2$ forward calls and gives the complete sketches
+$y_v=\bigoplus_{u\in N(v)}c_u$ with independent uniform $r$-bit labels.
+In the clean model the ordinary Bell measurement already yields these
+complete sketches in $2r$ calls.
+
+With complete sketches a dictionary maps each remaining label to its
+vertex. Each classifier call is one zero or dictionary lookup, and each
+leaf removal requires one word XOR. Duplicate or zero fingerprints abort.
+A collision among labels or with zero costs at most $n(n+1)2^{-r}/2$ in
+probability. Each wrong candidate on the ideal path costs $2^{-r}$.
+Hence $r=\lceil\log_2(4n^2/\delta)\rceil$ suffices. The decoder uses
+$O(n)$ expected dictionary operations on $r$-bit words after $O(nr)$
+processing of the measurement bits. The quantum circuit uses $O(nr)$
+local gates outside the oracle.
+
+\paragraph{Checks and prior work.}
+Run \texttt{python3 bell\_forest.py} with NumPy. The checker compares the
+full two-copy circuit distribution with the phase-drift formula on all 64
+four-vertex graphs and reconstructs six-vertex trees from statevector
+samples. Larger instances use the derived mask law. It also verifies the
+phase-averaged discrimination example and the forward-only echo.
+Montanaro and Shao \cite{ms} used Bell sampling to obtain $As$ for clean
+graph states. Becker et al.\ \cite{becker} used low-degree pruning for
+classical graph reconstruction from local messages. The result here
+combines phase cancellation on selected coordinates, recovery from those
+partial parities, and an exact discrimination law. Historical priority
+for this combination is unverified.
+
+\begin{thebibliography}{9}
+\raggedright
+\bibitem{remark} Supplied \emph{Remark}, p.~3, item 3 and footnote 3,
+\texttt{remark.pdf}. See also the local \texttt{tree-cancellation.tex}.
+\bibitem{ms} A. Montanaro and C. Shao, \href{https://doi.org/10.4230/LIPIcs.TQC.2022.1}
+{\emph{Quantum Algorithms for Learning a Hidden Graph}}, TQC 2022.
+\bibitem{becker} F. Becker et al., \href{https://arxiv.org/abs/1009.4447}
+{\emph{Adding a referee to an interconnection network: What can(not) be
+computed in one round}}.
+\end{thebibliography}
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass[11pt]{article}
+\usepackage[letterpaper,margin=0.9in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage[hidelinks]{hyperref}
+\newcommand{\F}{\mathbb F_q}
+\newcommand{\ket}[1]{\lvert #1\rangle}
+\newcommand{\bra}[1]{\langle #1\rvert}
+\newcommand{\ip}[2]{\langle #1,#2\rangle}
+\newcommand{\one}{\mathbf 1}
+\newcommand{\file}[1]{{\small\nolinkurl{#1}}}
+\setlength{\parskip}{4pt}
+\setlength{\parindent}{0pt}
+\title{Reading a hidden hyperplane from a coherent sample}
+\author{}\date{}
+\begin{document}
+\maketitle
+\vspace{-3.2em}
+Let $q$ be prime, $r\ge2$, and $f\in\F^r$ an unknown nonzero vector. Given
+copies of the state
+\[
+  \ket{H_f}=q^{-(r-1)/2}\sum_{x:\,f\cdot x=1}\ket{x},
+\]
+we want to read all $r$ entries of $f$. At $q=17$ and $r=64$, the optimal
+one-copy probability is $0.907558$, and two copies give $0.996494$.
+One classical uniform point on the same plane leaves exactly $17^{63}$
+equally likely candidates under the uniform prior. We construct a circuit
+attaining the quantum optimum for every copy count $k\ge1$. Its other use is
+as a coherent decoder for quantum information stored in superpositions
+of parallel planes.
+
+\section*{1. The operator in the Lean development}
+In the archive, lines 11--29 of
+\file{Formalism/LogVandermondeBounds/FinrankFiberSumZero.lean}
+define the incidence operators $U,D$ with entries
+$A_{x,f}=\one_{\{f\cdot x=1\}}$, the sum $\mathrm{Nm}$ along each punctured
+scalar line, and the total sum $\mathrm{tr}$ over nonzero points. We use
+the Euclidean inner product and omit the zero row and column. Then $D=A$,
+$U=A^*$, and the column of $D/q^{(r-1)/2}$ at $f$ is $\ket{H_f}$.
+
+In \file{LogVandermondeProofs/RamifiedLatticeOperatorIdentity.lean},
+\file{count1} and \file{count2} (lines 180 and 192) count the solutions of one
+and two independent equations. The latter proof finds an invertible
+two-coordinate minor. The proof of \file{DU_formula} (line 228) splits the
+double incidence sum according to equality, proportionality and independence.
+It obtains, for $x\ne0$,
+\[
+  (DUh)(x)=q^{r-1}h(x)-q^{r-2}\mathrm{Nm}\,h(x)+q^{r-2}\mathrm{tr}\,h .
+\]
+On amplitudes summing to zero along each punctured line, the last two terms
+vanish. The transposed identity gives the same conclusion on the column side.
+
+The archive also gives the operator a Fourier interpretation. With
+$\psi(t)=e^{2\pi i t/q}$ let $Gh(f)=\sum_{c\ne0}\psi(c)h(cf)$.
+The file \file{FourierIsometryOnNormKernel.lean} proves
+$GG^*=qI-\mathrm{Nm}$ at line 84. Its second theorem,
+\file{fourier_eq_down_comp_gauss} (115), gives the unnormalized
+additive Fourier transform $\mathcal F=DG$ on the line-sum-zero subspace.
+The sum over $f\cdot x=0$ vanishes line by line.
+In \file{FiniteModelOfAdmissibleTransports.lean}, \file{Unf.DU} (277) and
+\file{Unf.FF_eq} (384) transfer the two identities through the local
+coordinate charts. The proof calls \file{FF_DGs} (529) twice inside
+\file{FF_iso} (555), then iterates that inner-product identity in
+\file{FFlist} (568). This file is in the import closure of \file{src/Main.lean}.
+These are source-level observations. The algorithm and its optimality proof
+below use finite linear algebra independently of the status of GRH.
+
+\newpage
+\section*{2. The optimum from three intersection counts}
+Choose the representative $d$ of each projective direction whose first
+nonzero entry is $1$. There are $m=(q^r-1)/(q-1)$ directions. Write
+$H_{d,b}=\{x:d\cdot x=b\}$. We consider $B=\F^\times$, which gives exactly
+the Lean family via $f=d/b$, and $B=\F$, which includes planes through the
+origin. Put $s=|B|$. The input is $k$ identical coherent copies for a single
+hidden $(d,b)$. The output is a classical label. The source supplies copies
+directly, with no membership, preparation or inverse-preparation queries.
+
+For $d=e$, distinct offsets $b,c$ give disjoint supports. For $d\ne e$,
+the two planes share $q^{r-2}$ points, giving inner product $1/q$.
+Tensoring $k$ times raises each inner product to the $k$th power. Thus the
+Gram matrix on the $ms$ labels, with $J_n$ the all-ones matrix, is
+\[
+  G_B= I_{ms}+q^{-k}(J_m-I_m)\otimes J_s.
+\]
+Write $a=s/q^k$. Its spectrum, with multiplicities, is
+\[
+\begin{array}{lcc}
+\text{label amplitudes}&\text{eigenvalue}&\text{multiplicity}\\ \hline
+\text{sum zero across offsets within every direction}&1&m(s-1)\\
+\text{constant within directions, overall sum zero}&1-a&m-1\\
+\text{constant on all labels}&1+(m-1)a&1 .
+\end{array}
+\]
+In particular the normalized incidence matrix preserves an entire
+$m(q-2)$-dimensional space of coherent signals for $B=\F^\times$ and $k=1$.
+It preserves their inner products even when the signals superpose different
+directions.
+
+\textbf{Optimal measurement.} For either $B$, the maximum uniform-prior
+success probability, also the maximum worst-case probability, is
+\[
+ \boxed{\displaystyle P_k=
+ \left(\frac{s-1+(1-1/m)\sqrt{1-a}+m^{-1}\sqrt{1+(m-1)a}}{s}\right)^2 .}
+\]
+To prove this, collect the $k$-copy input columns in $V$, so $G_B=V^*V$.
+Every diagonal entry of $\sqrt{G_B}$ is
+$h=\operatorname{Tr}(\sqrt{G_B})/(ms)$ by the three spectral projections.
+The polar isometry of $V$ has an adjoint that sends the input columns to
+the columns of $\sqrt{G_B}$. Reading the label gives success $h^2$ on
+every input. This is the square-root measurement. For a direct upper
+bound set $R=(VV^*)^{1/2}$ on its support. Each column $v_j$ satisfies
+$v_j^*R^{-1}v_j=h$ by singular value decomposition. Cauchy--Schwarz
+gives $v_jv_j^*\le hR$. For any POVM $\{E_j\}$ the mean success is at most
+$\operatorname{Tr}(hR)/(ms)=h^2$. All inverses here act on the support,
+including the singular case $k=1$, $s=q$. This recovers the symmetric
+pure-state discrimination principle in this particular geometry \cite{eldar}.
+
+For classical uniform points from the Lean family, $t\ge1$ observations
+form the rows of a matrix $X$. Under a uniform prior the posterior is
+uniform on the $q^{r-\mathrm{rank}(X)}$ solutions of $Xf=\one$.
+For $t<r$ the success probability is at most $q^{t-r}$, regardless of
+postprocessing. The comparison counts coherent samples and classical
+random points from their respective sources.
+
+\newpage
+\section*{3. A circuit that attains the bound}
+The ordinary Fourier measurement reveals $d$ on a nonzero readout.
+Its outcome probabilities are independent of $b$. To retain $b$ we keep
+the scalar frequency coherent. The Fourier transform with positive phase
+on each point register gives
+\[
+  q^{-1/2}\sum_{t\in\F}\psi(bt)\ket{td}
+\]
+per copy. First allow all offsets. For $k=1$, relabel each nonzero vector
+$td$ as $(d,t)$ and map the shared zero vector to
+$m^{-1/2}\sum_e\ket{e,0}$. The output labels for nonzero $t$ are
+orthogonal to this vector, so this is an isometry. Apply the inverse
+one-dimensional Fourier transform to $t$ and measure. The correct label
+has amplitude $(q-1+1/\sqrt m)/q$ for every plane, including $b=0$.
+
+For $k\ge1$, combine the $k$ Fourier registers as follows.
+\begin{enumerate}
+\item For a nonzero tuple $(t_1d,\ldots,t_kd)$, extract $d$ from its first
+nonzero vector. Replace the scalars by $u=\sum_j t_j$ and
+$(t_2,\ldots,t_k)$. For $u\ne0$ the latter register is uniform on all
+$q^{k-1}$ tuples. For $u=0$ and a nonzero input tuple it is uniform on the
+$q^{k-1}-1$ nonzero tuples. Undo these uniform-state preparations in
+their respective branches. Keep the all-zero input as a separate symbol
+$\ket{*}$. When $k=1$ the second uniform set is empty and its branch
+has amplitude zero.
+\item Put $\theta=q^{1-k}$ and $\ket{\bar d}=m^{-1/2}\sum_e\ket e$.
+Up to the common factor $1/\sqrt q$, the $u=0$ component now equals
+$\sqrt{1-\theta}\ket{d,0}+\sqrt{\theta}\ket{*}$. In the plane
+spanned by $\ket{\bar d,0}$ and $\ket{*}$ rotate
+\[
+  \frac{\sqrt{1-\theta}\ket{\bar d,0}+\sqrt{m\theta}\ket{*}}
+       {\sqrt{1+(m-1)\theta}}
+   \quad\longmapsto\quad \ket{\bar d,0}.
+\]
+Act by the identity on the orthogonal complement of this plane. The unused
+output in this plane has zero amplitude for every promised input.
+\item Invert the scalar Fourier transform on $u$. For the full offset set
+this already implements the optimal decoder. Indeed, in the Fourier basis
+on offsets it acts on the input label map by amplitude gain $1$ at $u\ne0$.
+At $u=0$ the gains are $\sqrt{1-\theta}$ on differences of directions and
+$\sqrt{1+(m-1)\theta}$ on the uniform direction. Thus the map from
+labels through encoding and decoding is precisely $\sqrt{G_{\F}}$.
+\end{enumerate}
+
+\textbf{Taking advantage of the known nonzero offset.}
+When $B=\F^\times$, the final correction acts only on offset means. Split
+the direction register coherently into its uniform subspace and its
+orthogonal complement. On the offset register in each sector put
+$T=I+(\sqrt\lambda-1)\ket{+}\bra{+}$, where $\ket{+}$ is the uniform
+$q$-offset state and $\lambda$ is respectively $1+(m-1)\theta$ or
+$1-\theta$. Step 3 implemented $T$ in that sector. Let
+$\ket B=s^{-1/2}\sum_{b\in B}\ket b$. Rotate the real unit vector
+$T\ket B/\|T\ket B\|$ to $\ket B$ within
+$\mathrm{span}\{\ket B,\ket0\}$, fixing its orthogonal complement.
+Here $\|T\ket B\|^2=1+(\lambda-1)s/q>0$.
+Every difference between offsets in $B$ is fixed. Hence on the allowed
+inputs this correction produces exactly $\sqrt{G_B}$, with zero amplitude
+on disallowed labels. Reading $(d,b)$ and returning $d/b$ recovers $f$.
+
+\newpage
+\section*{4. Implementation, coherent signals and checks}
+\textbf{Resources.} The circuit uses $k$ copies on $kr$ field registers.
+Projective normalization uses a nonzero-coordinate test and one field
+inversion per recovered direction. Directions with first nonzero coordinate
+at $j$ form a block of size $q^{r-j}$ for $j=1,\ldots,r$. These contiguous
+blocks give efficient reversible ranking and unranking, hence preparation
+of $\ket{\bar d}$ from a uniform integer in $[0,m)$. The other uniform
+states use intervals of lengths $q$, $q-1$, $q^{k-1}$ and $q^{k-1}-1$.
+Uniform interval states can be prepared one bit at a time with amplitudes
+determined by the counts in each child interval. Unpreparing a uniform
+state reduces a rotation about it to a controlled low-dimensional rotation.
+The map on tuples extends reversibly by retaining the tuple coordinates
+until their uniform state is unprepared. The promised inputs have no
+tuples spanning two different directions.
+
+With reversible integer arithmetic, approximate Fourier transforms over
+$\mathbb Z/q$ and synthesized rotations, the gate count is polynomial in
+$k,r,\log q,\log(1/\epsilon)$ for overall error $\epsilon$. For example a
+cyclic Fourier transform can use phase estimation on the modular shift
+with extra precision, followed by coherent rounding of the frequency
+and unpreparation of the Fourier eigenstate from its known frequency.
+Repeated squaring of the shift amounts to modular addition by known
+constants. The probabilities in this note refer to ideal gates. Coherent
+state preparation from a classically stored list would have its own cost.
+
+\textbf{Decoding a quantum payload.} Let $c_{d,b}$ be arbitrary complex
+amplitudes with $\sum_{b\ne0}c_{d,b}=0$ for each $d$ and
+$\sum_{d,b}|c_{d,b}|^2=1$. Applying the one-copy decoder to
+\[
+     \sum_{d,b\ne0}c_{d,b}\ket{H_{d,b}}
+     \quad\text{produces}\quad
+     \sum_{d,b\ne0}c_{d,b}\ket{d,b}.
+\]
+The zero-frequency amplitude cancels inside each direction. The first
+register can therefore identify a single occupied direction while the
+second retains an unknown $(q-2)$-dimensional quantum state. Across
+multiple directions the entire linear isometry also preserves entanglement
+with any reference system. The inverse circuit encodes these signals.
+This is the line-sum-zero condition used by the arithmetic proof, with
+nonzero offsets corresponding to the nonzero scalar multiples of a normal.
+
+\textbf{Independent numerical check.} \file{hyperplane_decoder.py} builds
+each plane in the computational basis, tensors copies, applies the additive
+Fourier transform numerically, compresses uniform fibers, and carries out
+the rotations above. It checks the full complex amplitude matrix against
+the positive square root obtained by an independent singular value
+decomposition of the input columns. Eleven choices of $(q,r,k)$ over
+$q=2,3,5,7$ test both offset families and up to three copies. The maximum
+entrywise discrepancy across the checks was below $4\times10^{-15}$.
+The $r=64$ example is an evaluation of the exact formula.
+
+\textbf{Related algorithms.} Fourier sampling for hidden flats and
+quantum ridgelet transforms already reorganize spatial frequencies by
+direction \cite{childs,ridge}. Here the calculation gives the coherent
+treatment of the shared zero frequency and the optimal probability of
+recovering direction and offset together for the stated copy model.
+Priority for this specialization has not been established.
+
+\small
+\begin{thebibliography}{9}
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+\bibitem{eldar} Y. C. Eldar, A. Megretski and G. C. Verghese,
+\href{https://arxiv.org/abs/quant-ph/0211111}{Optimal detection of symmetric mixed quantum states}.
+\bibitem{childs} A. M. Childs, L. J. Schulman and U. V. Vazirani,
+\href{https://users.cms.caltech.edu/~schulman/Papers/quantum-nonlinear.pdf}{Quantum algorithms for hidden nonlinear structures}.
+\bibitem{ridge} H. Yamasaki, S. Subramanian, S. Hayakawa and S. Sonoda,
+\href{https://arxiv.org/abs/2301.11936}{Quantum ridgelet transform}.
+\end{thebibliography}
+\end{document}
